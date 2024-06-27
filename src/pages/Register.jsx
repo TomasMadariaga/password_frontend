@@ -32,6 +32,10 @@ export const Register = () => {
     if (isAuthenticated) navigate("/");
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    document.title = "Create an account"
+  }, [])
+
   return (
     <div className="flex-grow flex items-center justify-center my-8 py-10">
       <div className="xl:max-w-lg bg-slate-700 p-5 rounded-md border shadow-2xl">

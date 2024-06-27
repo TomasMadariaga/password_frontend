@@ -53,6 +53,11 @@ export const PasswordDashboard = () => {
     };
     get();
   }, [passwords, user]);
+
+  useEffect(() => {
+    document.title = "Passwords"
+  }, [])
+  
   return (
     <div className="flex-grow flex justify-center items-center">
       <div className="flex flex-col items-center">

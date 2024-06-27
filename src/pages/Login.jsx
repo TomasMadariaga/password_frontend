@@ -32,6 +32,10 @@ export const Login = () => {
     if (isAuthenticated) navigate("/");
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    document.title = "Sign In"
+  }, [])
+
   return (
     <div className="flex-grow flex items-center justify-center py-10 my-12">
       <div className="xl:max-w-lg bg-slate-700 px-5 py-4 rounded-md border shadow-2xl">

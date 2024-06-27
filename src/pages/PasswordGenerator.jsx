@@ -88,6 +88,10 @@ export const PasswordGenerator = () => {
     setPassword(generatePassword(configuracion));
   };
 
+  useEffect(() => {
+    document.title = "Password Generator"
+  }, [])
+
   return (
     <div className="pb-10 min-h-96 flex-grow">
       <div className="mb-12 text-center">
