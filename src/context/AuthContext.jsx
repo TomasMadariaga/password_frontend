@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const { data } = await verifyTokenRequest(cookies.token);
+      const { data } = await verifyTokenRequest(cookies._vercel_jwt);
       const { id, username, email } = data;
       if (!id || !username || !email) {
         setIsAuthenticated(false);
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    Cookies.remove("token", { domain: "localhost" });
+    Cookies.remove("_vercel_jwt", { domain: "localhost" });
     setIsAuthenticated(false);
     setUser(null);
   };
