@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const { data } = await verifyTokenRequest(cookies.token);
+      console.log(data)
       const { id, username, email } = data;
       if (!id || !username || !email) {
         setIsAuthenticated(false);
