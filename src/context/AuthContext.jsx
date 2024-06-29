@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const { data } = await verifyTokenRequest(cookies.token);
+      const { data } = await verifyTokenRequest(cookies._vercel_jwt);
       console.log(data)
       const { id, username, email } = data;
       if (!id || !username || !email) {
