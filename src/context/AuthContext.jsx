@@ -37,8 +37,8 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       console.log(cookies);
-      setIsAuthenticated(true);
       setUser({ id, username, email });
+      setIsAuthenticated(true);
       setLoading(false);
     } catch (error) {
       console.log(cookies);
