@@ -28,20 +28,20 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const data = await verifyTokenRequest(cookies.token);
-  
+      const { data } = await verifyTokenRequest(cookies.token);
+
       const { id, username, email } = data;
       if (!id || !username || !email) {
         setIsAuthenticated(false);
         setLoading(false);
         return;
       }
-      console.log(cookies)
+      console.log(cookies);
       setIsAuthenticated(true);
       setUser({ id, username, email });
       setLoading(false);
     } catch (error) {
-      console.log(cookies)
+      console.log(cookies);
       setIsAuthenticated(false);
       setUser(null);
       setLoading(false);
