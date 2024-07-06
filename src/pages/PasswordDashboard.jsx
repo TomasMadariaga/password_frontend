@@ -47,7 +47,6 @@ export const PasswordDashboard = () => {
     const get = async () => {
       if (user.id) {
         const { data } = await getPasswordsByUserId(user.id);
-        console.log(data);
         setPasswords(data);
       }
     };

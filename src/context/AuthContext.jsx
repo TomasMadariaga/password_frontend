@@ -19,29 +19,31 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   async function checkLogin() {
-    const cookies = Cookies.get();
+    // const cookies = Cookies.get();
+    const username = localStorage.getItem("username")
 
-    if (!cookies.token) {
+    if (!username) {
       setIsAuthenticated(false);
       setLoading(false);
       return setUser(null);
     }
 
     try {
-      const { data } = await verifyTokenRequest(cookies.token);
+      const username = localStorage.getItem("username")
+      const email = localStorage.getItem("email")
+      const id = localStorage.getItem("id")
+      // const { data } = await verifyTokenRequest(cookies.token);
 
-      const { id, username, email } = data;
+      // const { id, username, email } = data;
       if (!id || !username || !email) {
         setIsAuthenticated(false);
         setLoading(false);
         return;
       }
-      console.log(cookies);
       setUser({ id, username, email });
       setIsAuthenticated(true);
       setLoading(false);
     } catch (error) {
-      console.log(cookies);
       setIsAuthenticated(false);
       setUser(null);
       setLoading(false);
@@ -49,19 +51,28 @@ export const AuthProvider = ({ children }) => {
   }
 
   const signup = async (user) => {
-    const res = await registerRequest(user);
-    setUser(res.data);
+    const {data} = await registerRequest(user);
+    localStorage.setItem("username", data.username)
+    localStorage.setItem("email", data.email)
+    localStorage.setItem("id", data.id)
+    setUser(data.id, data.username, data.email);
     setIsAuthenticated(true);
   };
 
   const signin = async (user) => {
-    const res = await loginRequest(user);
+    const {data} = await loginRequest(user);
+    localStorage.setItem("username", data.username)
+    localStorage.setItem("email", data.email)
+    localStorage.setItem("id", data.id)
     setIsAuthenticated(true);
-    setUser(res.data);
+    setUser(data.id, data.username, data.email);
   };
 
   const logout = async () => {
-    Cookies.remove("token", { domain: ".vercel.app" });
+    localStorage.removeItem("id")
+    localStorage.removeItem("email")
+    localStorage.removeItem("username")
+    // Cookies.remove("token", { domain: ".vercel.app" });
     setIsAuthenticated(false);
     setUser(null);
   };
