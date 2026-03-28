@@ -1,6 +1,5 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { registerRequest, loginRequest, verifyTokenRequest } from "../api/auth";
-import Cookies from "js-cookie";
 
 export const AuthContext = createContext();
 
@@ -18,77 +17,72 @@ export const AuthProvider = ({ children }) => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  async function checkLogin() {
-    // const cookies = Cookies.get();
-    const username = localStorage.getItem("username")
-
-    if (!username) {
-      setIsAuthenticated(false);
-      setLoading(false);
-      return setUser(null);
-    }
-
+  const signup = async (userData) => {
     try {
-      const username = localStorage.getItem("username")
-      const email = localStorage.getItem("email")
-      const id = localStorage.getItem("id")
-      // const { data } = await verifyTokenRequest(cookies.token);
-
-      // const { id, username, email } = data;
-      if (!id || !username || !email) {
-        setIsAuthenticated(false);
-        setLoading(false);
-        return;
-      }
-      setUser({ id, username, email });
+      const { data } = await registerRequest(userData);
+      localStorage.setItem("token", data.token);
       setIsAuthenticated(true);
-      setLoading(false);
+      setUser({ id: data.id, username: data.username, email: data.email });
+      setErrors([]);
     } catch (error) {
+      const errorMsg = error.response?.data?.message || "Registration failed";
+      setErrors(Array.isArray(errorMsg) ? errorMsg : [errorMsg]);
+    }
+  };
+
+  const signin = async (userData) => {
+    try {
+      const { data } = await loginRequest(userData);
+      localStorage.setItem("token", data.token);
+      setIsAuthenticated(true);
+      setUser({ id: data.id, username: data.username, email: data.email });
+      setErrors([]);
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Login failed";
+      setErrors(Array.isArray(errorMsg) ? errorMsg : [errorMsg]);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+    setUser(null);
+    setErrors([]);
+  };
+
+  const checkLogin = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
       setIsAuthenticated(false);
       setUser(null);
       setLoading(false);
+      return;
     }
-  }
 
-  const signup = async (user) => {
-    const {data} = await registerRequest(user);
-    localStorage.setItem("username", data.username)
-    localStorage.setItem("email", data.email)
-    localStorage.setItem("id", data.id)
-    setUser(data.id, data.username, data.email);
-    setIsAuthenticated(true);
-  };
-
-  const signin = async (user) => {
-    const {data} = await loginRequest(user);
-    localStorage.setItem("username", data.username)
-    localStorage.setItem("email", data.email)
-    localStorage.setItem("id", data.id)
-    setIsAuthenticated(true);
-    setUser(data.id, data.username, data.email);
-  };
-
-  const logout = async () => {
-    localStorage.removeItem("id")
-    localStorage.removeItem("email")
-    localStorage.removeItem("username")
-    // Cookies.remove("token", { domain: ".vercel.app" });
-    setIsAuthenticated(false);
-    setUser(null);
-  };
-
-  useEffect(() => {
-    if (errors.length > 0) {
-      const timer = setTimeout(() => {
-        setErrors([]);
-      }, 5000);
-      return () => clearTimeout(timer);
+    try {
+      const { data } = await verifyTokenRequest(token);
+      setUser({ id: data.id, username: data.username, email: data.email });
+      setIsAuthenticated(true);
+    } catch (error) {
+      setIsAuthenticated(false);
+      setUser(null);
+    } finally {
+      setLoading(false);
     }
-  }, [errors]);
+  };
 
   useEffect(() => {
     checkLogin();
   }, []);
+
+  useEffect(() => {
+    if (errors.length > 0) {
+      const timer = setTimeout(() => setErrors([]), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errors]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -99,7 +93,6 @@ export const AuthProvider = ({ children }) => {
         user,
         isAuthenticated,
         errors,
-        checkLogin,
       }}
     >
       {children}

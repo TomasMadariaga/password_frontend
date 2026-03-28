@@ -2,14 +2,15 @@ export const ButtonMinus = ({ restarCaracter }) => {
   return (
     <button
       onClick={restarCaracter}
-      className="flex-1 w-full bg-purple-600 text-white inline-flex items-center justify-center h-10 align-top text-lg text-center rounded-s-md cursor-pointer transition-all hover:bg-purple-700"
+      className="w-8 sm:w-10 h-8 sm:h-10 bg-accent text-white inline-flex items-center justify-center rounded-l-md transition-all hover:bg-accent/80 focus:outline-none focus:ring-2 focus:ring-accent/50"
+      aria-label="Decrease length"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         strokeWidth="1.5"
         stroke="currentColor"
-        className="size-6"
+        className="w-4 h-4 sm:w-5 sm:h-5"
       >
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
       </svg>
@@ -21,7 +22,8 @@ export const ButtonPlus = ({ incrementarCaracter }) => {
   return (
     <button
       onClick={incrementarCaracter}
-      className="w-full flex-1 bg-purple-600 text-white inline-flex items-center justify-center h-10 align-top text-lg text-center rounded-e-md cursor-pointer transition-all hover:bg-purple-700"
+      className="w-8 sm:w-10 h-8 sm:h-10 bg-accent text-white inline-flex items-center justify-center rounded-r-md transition-all hover:bg-accent/80 focus:outline-none focus:ring-2 focus:ring-accent/50"
+      aria-label="Increase length"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -29,7 +31,7 @@ export const ButtonPlus = ({ incrementarCaracter }) => {
         viewBox="0 0 24 24"
         strokeWidth="1.5"
         stroke="currentColor"
-        className="size-6"
+        className="w-4 h-4 sm:w-5 sm:h-5"
       >
         <path
           strokeLinecap="round"
@@ -45,18 +47,21 @@ export const ButtonCheck = ({ select, toggle }) => {
   return (
     <button
       onClick={toggle}
-      className={`w-full flex-1 bg-purple-600 text-white inline-flex items-center justify-center h-10 align-top text-lg text-center rounded-md cursor-pointer transition-all hover:bg-purple-700 ${
-        select === false && "bg-purple-800 hover:bg-purple-800"
+      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-accent/50 ${
+        select
+          ? "bg-accent text-white hover:bg-accent/80"
+          : "bg-border text-text/50 hover:bg-border/80"
       }`}
+      aria-label={select ? "Disable option" : "Enable option"}
     >
       {select ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          strokeWidth="1.5"
+          strokeWidth="2"
           stroke="currentColor"
-          className="size-6"
+          className="w-4 h-4 sm:w-5 sm:h-5"
         >
           <path
             strokeLinecap="round"
@@ -69,9 +74,9 @@ export const ButtonCheck = ({ select, toggle }) => {
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          strokeWidth="1.5"
+          strokeWidth="2"
           stroke="currentColor"
-          className="size-6"
+          className="w-4 h-4 sm:w-5 sm:h-5"
         >
           <path
             strokeLinecap="round"
@@ -88,16 +93,16 @@ export const ButtonGenerate = () => {
   return (
     <button
       type="submit"
-      className="w-full flex-1 bg-purple-600 text-white inline-flex items-center justify-center h-10 align-top text-lg text-center rounded-md cursor-pointer transition-all hover:bg-purple-700"
+      className="sm:flex-1 bg-accent text-white inline-flex items-center justify-center gap-2 h-8 sm:h-10 px-3 sm:px-4 rounded-lg font-medium text-sm sm:text-base transition-all hover:bg-accent/80 focus:outline-none focus:ring-2 focus:ring-accent/50"
     >
-      Generate{" "}
+      Generate
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
         strokeWidth="1.5"
         stroke="currentColor"
-        className="size-6"
+        className="w-3 h-3 sm:w-4 sm:h-4"
       >
         <path
           strokeLinecap="round"
@@ -113,9 +118,23 @@ export const ButtonSave = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      type="submit"
-      className="w-full flex-1 bg-purple-600 text-white inline-flex items-center justify-center h-10 align-top text-lg text-center rounded-md cursor-pointer transition-all hover:bg-purple-700"
+      type="button"
+      className="w-full bg-accent text-white inline-flex items-center justify-center gap-2 h-8 sm:h-10 px-3 sm:px-4 rounded-lg font-medium text-sm sm:text-base transition-all hover:bg-accent/80 focus:outline-none focus:ring-2 focus:ring-accent/50"
     >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth="1.5"
+        stroke="currentColor"
+        className="w-3 h-3 sm:w-4 sm:h-4"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+        />
+      </svg>
       Save password
     </button>
   );
@@ -125,7 +144,8 @@ export const ButtonDelete = ({ onClick, id }) => {
   return (
     <button
       onClick={() => onClick(id)}
-      className="bg-red-500 rounded-md px-2 transition-all hover:bg-red-600"
+      className="bg-red-500/20 text-red-400 hover:bg-red-500/30 px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-red-500/50"
+      aria-label="Delete password"
     >
       Delete
     </button>

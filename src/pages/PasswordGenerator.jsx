@@ -11,64 +11,27 @@ import { Input } from "../components/Input";
 import { Modal } from "../components/ModalWindow";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import { getStrength } from "../functions/getPasswordStrength";
+import { usePasswordConfig } from "../functions/passwordConfig";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 export const PasswordGenerator = () => {
   const { isAuthenticated } = useAuth();
-  const [configuracion, setConfiguracion] = useState({
-    nroCaracteres: 7,
-    simbolos: true,
-    numeros: true,
-    mayusculas: true,
-  });
+  const {
+    config,
+    toggleSimbolos,
+    toggleNumeros,
+    toggleMayusculas,
+    incrementarCaracter,
+    restarCaracter,
+  } = usePasswordConfig();
 
   const [password, setPassword] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    setPassword(generatePassword(configuracion));
-  }, [configuracion]);
-
-  const toggleSimbolos = () => {
-    setConfiguracion((config) => {
-      const newConfig = { ...config };
-      newConfig.simbolos = !newConfig.simbolos;
-      return newConfig;
-    });
-  };
-
-  const toggleNumeros = () => {
-    setConfiguracion((config) => {
-      const newConfig = { ...config };
-      newConfig.numeros = !newConfig.numeros;
-      return newConfig;
-    });
-  };
-
-  const toggleMayusculas = () => {
-    setConfiguracion((config) => {
-      const newConfig = { ...config };
-      newConfig.mayusculas = !newConfig.mayusculas;
-      return newConfig;
-    });
-  };
-
-  const incrementarCaracter = () => {
-    setConfiguracion((config) => {
-      const newConfig = { ...config };
-      newConfig.nroCaracteres += 1;
-      return newConfig;
-    });
-  };
-
-  const restarCaracter = () => {
-    if (configuracion.nroCaracteres > 1) {
-      setConfiguracion((config) => {
-        const newConfig = { ...config };
-        newConfig.nroCaracteres -= 1;
-        return newConfig;
-      });
-    }
-  };
+    setPassword(generatePassword(config));
+  }, [config]);
 
   const openModal = () => {
     if (!isAuthenticated) {
@@ -85,58 +48,110 @@ export const PasswordGenerator = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    setPassword(generatePassword(configuracion));
+    setPassword(generatePassword(config));
   };
 
-  useEffect(() => {
-    document.title = "Password Generator"
-  }, [])
+  usePageTitle()
+
+  const strength = getStrength(password, config);
 
   return (
-    <div className="pb-10 min-h-96 flex-grow">
-      <div className="mb-12 text-center">
-        <h1 className="w-full align-top">Password Generator</h1>
+    <div className="max-w-2xl mx-auto py-10 px-4">
+      <div className="text-center mb-8">
+        <h1 className="font-sans text-3xl sm:text-4xl font-bold text-text-h mb-2">
+          Password Generator
+        </h1>
+        <p className="font-sans text-text max-w-md mx-auto">
+          Generate strong, secure passwords instantly
+        </p>
       </div>
-      <div className="grid justify-center">
-        <form onSubmit={onSubmit} className="grid justify-center">
-          <div className="mb-10 grid grid-cols-2 gap-10">
-            <label>Numero de caracteres</label>
-            <div className="flex justify-between text-center">
+
+      <div className="bg-card/30 border border-border rounded-2xl p-6 shadow-xl backdrop-blur-sm transition-all duration-300 hover:shadow-2xl">
+        <form onSubmit={onSubmit} className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <label className="font-sans text-text font-medium text-center sm:text-left">
+              Password length
+            </label>
+            <div className="flex sm:scale-100 scale-125 items-center justify-center sm:justify-end gap-3">
               <ButtonMinus restarCaracter={restarCaracter} />
-              <span className="flex-1 leading-10 bg-purple-900">
-                {configuracion.nroCaracteres}
+              <span className="font-mono w-12 text-center text-text-h text-lg font-semibold">
+                {config.nroCaracteres}
               </span>
               <ButtonPlus incrementarCaracter={incrementarCaracter} />
             </div>
           </div>
-          <div className="mb-10 grid grid-cols-2 gap-10">
-            <label>¿Incluir Simbolos?</label>
-            <ButtonCheck
-              toggle={toggleSimbolos}
-              select={configuracion.simbolos}
-            />
+
+          <div className="space-y-4 bg-card/20 rounded-xl p-4">
+            <div className="flex justify-between items-center">
+              <label className="font-sans text-text">
+                Include special characters?
+              </label>
+              <ButtonCheck
+                toggle={toggleSimbolos}
+                select={config.simbolos}
+              />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="font-sans text-text">Include numbers?</label>
+              <ButtonCheck
+                toggle={toggleNumeros}
+                select={config.numeros}
+              />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="font-sans text-text">Include uppercase?</label>
+              <ButtonCheck
+                toggle={toggleMayusculas}
+                select={config.mayusculas}
+              />
+            </div>
           </div>
-          <div className="mb-10 grid grid-cols-2 gap-10">
-            <label>¿Incluir Numeros?</label>
-            <ButtonCheck
-              toggle={toggleNumeros}
-              select={configuracion.numeros}
-            />
-          </div>
-          <div className="mb-10 grid grid-cols-2 gap-10">
-            <label>¿Incluir Mayusculas?</label>
-            <ButtonCheck
-              toggle={toggleMayusculas}
-              select={configuracion.mayusculas}
-            />
-          </div>
-          <div className="mb-10 grid grid-cols-2 gap-10">
-            <ButtonGenerate />
-            <Input type="text" value={password} />
+
+          <div className="pt-4 border-t border-border">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <ButtonGenerate />
+              <Input type="text" value={password} readOnly />
+            </div>
           </div>
         </form>
-        <ButtonSave onClick={openModal} />
+
+        {password && (
+          <div className="mt-6 animate-in fade-in duration-300">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-sans text-text text-sm">
+                Password strength
+              </span>
+              <span
+                className={`font-mono text-xs font-medium px-2 py-0.5 rounded-full ${
+                  strength.text === "Weak"
+                    ? "bg-red-500/20 text-red-400"
+                    : strength.text === "Medium"
+                      ? "bg-yellow-500/20 text-yellow-400"
+                      : "bg-green-500/20 text-green-400"
+                }`}
+              >
+                {strength.text}
+              </span>
+            </div>
+            <div className="h-1.5 bg-border rounded-full overflow-hidden">
+              <div
+                className={`h-full ${strength.color} transition-all duration-500 ease-out rounded-full`}
+                style={{ width: strength.width }}
+              />
+            </div>
+            <div className="flex justify-between mt-1 text-text/40 text-xs">
+              <span>Weak</span>
+              <span>Medium</span>
+              <span>Strong</span>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-6">
+          <ButtonSave onClick={openModal} />
+        </div>
       </div>
+
       {isModalOpen && <Modal value={password} toggle={openModal} />}
     </div>
   );

@@ -1,87 +1,143 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 export const Register = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
   const navigate = useNavigate();
-
-  const { signup, isAuthenticated } = useAuth();
+  const { signup, isAuthenticated} = useAuth();
+  const [apiError, setApiError] = useState(null);
 
   const onSubmit = handleSubmit(async (values) => {
+    setApiError(null);
     try {
       await signup(values);
-    } catch (error) {
-      toast.error(`${error.response.data.message}`, {
+      toast.success("Account created successfully!", {
         position: "top-center",
-        pauseOnHover: false,
         autoClose: 3000,
-        closeButton: false,
-        className: "text-center",
+      });
+      reset();
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Registration failed";
+      setApiError(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-center",
+        autoClose: 3000,
       });
     }
   });
 
   useEffect(() => {
     if (isAuthenticated) navigate("/");
-  }, [isAuthenticated]);
+  }, [isAuthenticated, navigate]);
 
-  useEffect(() => {
-    document.title = "Create an account"
-  }, [])
+  usePageTitle("Sign Up")
 
   return (
-    <div className="flex-grow flex items-center justify-center my-8 py-10">
-      <div className="xl:max-w-lg bg-slate-700 p-5 rounded-md border shadow-2xl">
-        <h1 className="text-2xl font-bold text-white">Register</h1>
-        <form className="p-5 flex flex-col gap-2" onSubmit={onSubmit}>
-          <input
-            className="bg-zinc-600 py-1 text-white rounded-md"
-            type="text"
-            {...register("username", { required: true })}
-            placeholder="Username"
-          />
-          {errors.username && (
-            <p className="text-red-500">Username is required</p>
-          )}
-          <input
-            className="bg-zinc-600 py-1 text-white rounded-md"
-            type="email"
-            {...register("email", { required: true })}
-            placeholder="Email"
-          />
-          {errors.email && <p className="text-red-500">Email is required</p>}
-          <input
-            className="bg-zinc-600 py-1 text-white rounded-md"
-            type="password"
-            {...register("password", { required: true })}
-            placeholder="Password"
-          />
-          {errors.password && (
-            <p className="text-red-500">Password is required</p>
-          )}
-          <button
-            className="bg-purple-700 text-white px-4 py-2 rounded-md my-2 transition-all hover:bg-purple-800"
-            type="submit"
-          >
-            Register
-          </button>
-          <p className="flex gap-x-2 justify-between text-white">
-            Already have an account?
-            <Link
-              className="text-sky-500 underline underline-offset-2 xl:no-underline xl:text-sky-500 transition-all hover:underline hover:underline-offset-4"
-              to="/login"
-            >
-              Login
-            </Link>
+    <div className="grow flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="font-sans text-3xl font-bold text-text-h mb-2">
+            Create an account
+          </h1>
+          <p className="font-sans text-text">
+            Start generating secure passwords
           </p>
-        </form>
+        </div>
+
+        <div className="bg-card/30 border border-border rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+          {apiError && (
+            <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm text-center">
+              {apiError}
+            </div>
+          )}
+
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div>
+              <label className="block font-sans text-text text-sm mb-1">
+                Username
+              </label>
+              <input
+                type="text"
+                {...register("username", { required: "Username is required" })}
+                className={`w-full bg-card border ${
+                  errors.username ? "border-red-500" : "border-border"
+                } rounded-lg px-3 py-2 text-text placeholder:text-text/40 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all`}
+                placeholder="johndoe"
+              />
+              {errors.username && (
+                <p className="text-red-400 text-xs mt-1">
+                  {errors.username.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block font-sans text-text text-sm mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                {...register("email", { required: "Email is required" })}
+                className={`w-full bg-card border ${
+                  errors.email ? "border-red-500" : "border-border"
+                } rounded-lg px-3 py-2 text-text placeholder:text-text/40 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all`}
+                placeholder="you@example.com"
+              />
+              {errors.email && (
+                <p className="text-red-400 text-xs mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block font-sans text-text text-sm mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                {...register("password", { required: "Password is required" })}
+                className={`w-full bg-card border ${
+                  errors.password ? "border-red-500" : "border-border"
+                } rounded-lg px-3 py-2 text-text placeholder:text-text/40 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all`}
+                placeholder="••••••••"
+              />
+              {errors.password && (
+                <p className="text-red-400 text-xs mt-1">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-accent text-white py-2 rounded-lg font-medium transition-all hover:bg-accent/80 focus:outline-none focus:ring-2 focus:ring-accent/50"
+            >
+              Create account
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="font-sans text-text text-sm">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-accent hover:underline transition"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
