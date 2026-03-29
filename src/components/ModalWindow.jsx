@@ -15,7 +15,7 @@ export const Modal = ({ toggle, value }) => {
 
   const onSubmit = handleSubmit(async (values) => {
     const { id } = user;
-    const userdata = { ...values, userId: id, password: value };
+    const userdata = { ...values, userId: id};
     await savePassword(userdata);
     toast.success("Password saved!", {
       position: "top-center",
